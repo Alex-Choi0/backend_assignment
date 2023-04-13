@@ -67,4 +67,12 @@ export class CreateMovieDto {
     type: Number,
   })
   rating: number;
+
+  @IsString({ each: true })
+  @ApiProperty({
+    required: true,
+    description: '영화 장르, 장르가 없을시 빈배열로 입력',
+    example: ['공상과학', '액션', '스피드'],
+  })
+  readonly genre: string[];
 }

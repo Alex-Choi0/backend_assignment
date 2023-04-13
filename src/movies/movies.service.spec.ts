@@ -2,17 +2,20 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MovieEntity } from './entities/movie.entity';
 import { MoviesService } from './movies.service';
+import { GenreRepository } from './repository/genre.repository';
 import { MovieRepository } from './repository/movie.repository';
 import {
   mockCreateDto,
   mockDataBase,
   mockFindOneRecord,
+  mockGenreRepository,
   mockMovieRepository,
 } from './test/movies.mock';
 
 describe('MoviesService', () => {
   let service: MoviesService;
   let movieRepository: MovieRepository;
+  let genreRepository: GenreRepository;
   let mockDB = JSON.parse(JSON.stringify(mockDataBase));
   let mockCreateDto1 = JSON.parse(JSON.stringify(mockCreateDto));
   let mockFindOneRecord1 = JSON.parse(JSON.stringify(mockFindOneRecord));
@@ -25,11 +28,16 @@ describe('MoviesService', () => {
           provide: MovieRepository,
           useValue: mockMovieRepository,
         },
+        {
+          provide: GenreRepository,
+          useValue: mockGenreRepository,
+        },
       ],
     }).compile();
 
     service = module.get<MoviesService>(MoviesService);
     movieRepository = module.get<MovieRepository>(MovieRepository);
+    genreRepository = module.get<GenreRepository>(GenreRepository);
   });
 
   afterEach(() => {

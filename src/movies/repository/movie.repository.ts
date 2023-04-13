@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateMovieDto } from '../dto/create-movie.dto';
+import { GenreEntity } from '../entities/genre.entity';
 import { MovieEntity } from '../entities/movie.entity';
 
 @Injectable()
@@ -19,16 +20,18 @@ export class MovieRepository {
     return await this.movieEntity.find({
       skip,
       take,
+      relations: ['genre'],
     });
   }
 
   async getFullRecord() {
-    return await this.movieEntity.find();
+    return await this.movieEntity.find({ relations: ['genre'] });
   }
 
   async getOneRecord(id: string) {
     return await this.movieEntity.findOne({
       where: { id },
+      relations: ['genre'],
     });
   }
 
@@ -38,8 +41,8 @@ export class MovieRepository {
     });
   }
 
-  createOneData(dto: CreateMovieDto) {
-    return this.movieEntity.create(dto);
+  createOneData(dto: CreateMovieDto, genre?: GenreEntity[]) {
+    return this.movieEntity.create({ ...dto, genre });
   }
 
   async createOneRecord(entity: MovieEntity) {

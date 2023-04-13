@@ -6,7 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { GenreEntity } from './entities/genre.entity';
 import { MovieEntity } from './entities/movie.entity';
+import { GenreRepository } from './repository/genre.repository';
 import { MovieRepository } from './repository/movie.repository';
 
 @Injectable()
@@ -14,6 +16,8 @@ export class MoviesService {
   constructor(
     @Inject(MovieRepository)
     private readonly movieRepository: MovieRepository,
+    @Inject(GenreRepository)
+    private readonly genreRepository: GenreRepository,
   ) {}
 
   async create(dto: CreateMovieDto) {
@@ -24,7 +28,16 @@ export class MoviesService {
         throw new ConflictException('이미 존재하는 타이틀(title)입니다.');
       }
 
-      const createData: MovieEntity = this.movieRepository.createOneData(dto);
+      const genre =
+        dto.genre &&
+        (await Promise.all(
+          dto.genre.map((name) => this.preloadGenreByName(name)),
+        ));
+
+      const createData: MovieEntity = this.movieRepository.createOneData(
+        dto,
+        genre,
+      );
       await this.movieRepository.createOneRecord(createData);
 
       return {
@@ -83,9 +96,16 @@ export class MoviesService {
         throw new NotFoundException('존재하지 않는 movie_id 입니다.');
       }
 
+      const genre =
+        dto.genre &&
+        (await Promise.all(
+          dto.genre.map((name) => this.preloadGenreByName(name)),
+        ));
+
       const createData: MovieEntity = {
         id,
         ...dto,
+        genre,
       };
 
       await this.movieRepository.createOneRecord(createData);
@@ -114,5 +134,13 @@ export class MoviesService {
     } catch (err) {
       throw new HttpException(err.message, err.status ? err.status : 500);
     }
+  }
+
+  private async preloadGenreByName(name: string): Promise<GenreEntity> {
+    const existingGenre = await this.genreRepository.getOneRecord(name);
+    if (existingGenre) {
+      return existingGenre;
+    }
+    return this.genreRepository.createOneData(name);
   }
 }
