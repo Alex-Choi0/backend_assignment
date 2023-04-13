@@ -87,6 +87,8 @@ $ docker-compose down
 
 <p>서버가 구동이 되면 자동으로 Swagger 페이지가 생성이 됩니다.</p>
 <p><a href="http://127.0.0.1:3000/api-docs">http://127.0.0.1:[설정한 포트(기본 3000)]/api-docs</a> 으로 접속하면 API문서를 확인할수 있습니다.</p>
+<p><a href="https://youtu.be/87xrmqP9F1M">참고링크</a></p>
+<p><br /></p>
 ## Stay in touch
 
 - 개발자 - [최재호 (Alex Choi)](https://engineeringshw.blogspot.com/)
